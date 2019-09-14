@@ -5,13 +5,11 @@
 
 from emotion_api_demo.gui import GUIRoot
 from emotion_api_demo.request_emotion import RequestEmotion
-
+from tkinter import Tk
 
 def main():
     """The main function."""
-    gui_root = GUIRoot(RequestEmotion)
-    gui_root.mainloop()
-
+    GUIRoot(Tk(), RequestEmotion)
 
 if __name__ == '__main__':
     main()

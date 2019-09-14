@@ -10,12 +10,12 @@ import numpy as np
 from PIL import Image
 from .mpl import ResultImg
 
-
 class GUIRoot(Tk):
     """The tkinter GUI root class."""
 
-    def __init__(self, thread_cls):
+    def __init__(self, window, thread_cls):
         super().__init__()
+        self.window = window
         self.thread_cls = thread_cls
         self.img = None
         self.title("Emotion API")
@@ -23,6 +23,8 @@ class GUIRoot(Tk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=2)
         self.grid_rowconfigure(4, weight=1)
+
+        self.vid = VideoCapture()
 
         # Create LabelFrames
         lf_key = LabelFrame(self, text="Emotion API Key")
@@ -106,6 +108,16 @@ class GUIRoot(Tk):
         self.plot = ResultImg(lf_img)
         self.plot.grid(sticky=N+S+W+E)
 
+        self.update()
+        self.mainloop()
+
+    def update(self):
+        s, self.img = self.vid.get_frame()
+        self.img = cv2.imencode('.jpg', self.img)[1].tostring()
+        self.plot.imshow(img_decode(self.img))
+
+        self.window.after(10, self.update)
+
     def change_mode(self):
         """Change the image source mode."""
         if self.var_mode.get() == 'local':
@@ -170,13 +182,15 @@ class GUIRoot(Tk):
 
     def get_cam_img(self):
         """Get the image from the laptop camera."""
-        cam = cv2.VideoCapture(0)   # 0 -> index of camera
-        s, self.img = cam.read()
-        self.img = cv2.imencode('.jpg', self.img)[1].tostring()
-        if s:    # frame captured without any errors
-            self.print_console("Camera image captured.")
-            self.plot.imshow(img_decode(self.img))
-            self.btn_request.config(state='normal')
+        # cam = cv2.VideoCapture(0)   # 0 -> index of camera
+        # while(True):
+        #     s, self.img = cam.read()
+        #     self.plot.imshow(img_decode(self.img))
+            # cv2.imshow('frame', )
+            # self.img = cv2.imencode('.jpg', self.img)[1].tostring()
+            # if s:    # frame captured without any errors
+            #     self.print_console("Camera image captured.")
+            #     self.btn_request.config(state='normal')
 
     def print_console(self, input_str):
         """Print the text on the conolse."""
@@ -185,6 +199,33 @@ class GUIRoot(Tk):
         self.console.config(state='disable')
         self.console.see(END)
 
+
+class VideoCapture:
+    def __init__(self):
+        # Open the video source
+        self.vid = cv2.VideoCapture(0)
+        if not self.vid.isOpened():
+            raise ValueError("Unable to open video source", video_source)
+ 
+        # Get video source width and height
+        self.width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)
+        self.height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
+ 
+    def get_frame(self):
+         if self.vid.isOpened():
+            ret, frame = self.vid.read()
+            if ret:
+                # Return a boolean success flag and the current frame converted to BGR
+                return (ret, frame)
+            else:
+                return (ret, None)
+         else:
+            return (ret, None)
+ 
+     # Release the video source when the object is destroyed
+    def __del__(self):
+        if self.vid.isOpened():
+            self.vid.release()
 
 def img_decode(data):
     """Convert the image codec from OpenCV to matplotlib readable."""
