@@ -35,7 +35,7 @@ class ResultImg(Frame):
         for curr_face in result:
             face_rect = curr_face['faceRectangle']
             curr_emotion = max(
-                curr_face['scores'].items(), key=operator.itemgetter(1))[0]
+                curr_face['faceAttributes']['emotion'].items(), key=operator.itemgetter(1))[0]
             self.rectangles.append(self.ax.add_patch(Rectangle((face_rect['left'],
                                                                 face_rect['top']),
                                                                face_rect['width'],
@@ -47,4 +47,4 @@ class ResultImg(Frame):
                              xy=(face_rect['left'], face_rect['top'] - 15),
                              color='black',
                              bbox=dict(boxstyle="round", fc="w", lw=0, alpha=0.6))
-        self.canvas.draw()
+        # self.canvas.draw()
