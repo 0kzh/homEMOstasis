@@ -1,7 +1,7 @@
 from threading import Thread
 import time
 import requests
-
+import os
 
 
 class Response(Thread):
@@ -9,10 +9,21 @@ class Response(Thread):
         super().__init__()
         self.emotion = emotion
         self.key = ""
-        self.fout = open("../logs/debug.log", "a")
+
+        # For file debug
+        script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
+        rel_path = "../logs/debug.log"
+        abs_file_path = os.path.join(script_dir, rel_path)
+
+        self.fout = open(abs_file_path, "a")
+        self.fout.write("Hello world!")
 
     def __del__(self):
         self.fout.close()
+
+    def fetchData(self):
+        # Add query code here.
+        pass
 
     def run(self): 
         ## Main function called by Thread.
@@ -29,6 +40,7 @@ class Response(Thread):
 
         else:
             self.fout.write("Error: No result in API response.")
+
     def process_request(self, json, headers, params):
         """(Pulled from request_emotions) Request the API server.
 
@@ -74,4 +86,3 @@ class Response(Thread):
             break
         return result
 
-        
