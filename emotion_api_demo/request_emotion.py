@@ -3,6 +3,7 @@
 import time
 from threading import Thread
 import requests
+from emotion_api_demo import get_response
 
 class RequestEmotion(Thread):
     """The class to request result from Emotion API."""
@@ -31,20 +32,25 @@ class RequestEmotion(Thread):
         self.source = source
         self.plot = plot
         self.print = print_func
-    def run(self):
+    def run(self): ## Main function called by Thread.
         headers = dict()
         headers['Ocp-Apim-Subscription-Key'] = self.key
         if self.mode == 'url':
             headers['Content-Type'] = 'application/json'
             json = {'url': self.source}
             data, params = None, None
-        else:
+        else: 
             data = self.source
             headers['Content-Type'] = 'application/octet-stream'
             json, params = None, None
         result = self.process_request(json, data, headers, params)
         if result:
             self.print(result)
+            emodict = result[0]["faceAttributes"]["emotion"]
+            emotion = max(emodict, key=emodict.get)
+            response = get_response.Response(emotion, self.print)
+
+
             self.plot.draw_labels(result)
         else:
             self.print("Error: No result in API response.")
