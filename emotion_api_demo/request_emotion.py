@@ -48,8 +48,8 @@ class RequestEmotion(Thread):
             self.print(result)
             emodict = result[0]["faceAttributes"]["emotion"]
             emotion = max(emodict, key=emodict.get)
-            response = get_response.Response(emotion, self.print)
-
+            response = get_response.Response(emotion)
+            self.print(response.emotion)
 
             self.plot.draw_labels(result)
         else:

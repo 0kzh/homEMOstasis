@@ -5,11 +5,14 @@ import requests
 
 
 class Response(Thread):
-    def __init__(self, emotion, output):
+    def __init__(self, emotion):
         super().__init__()
         self.emotion = emotion
         self.key = ""
-        self.output = output ## Not caring about deadlock references for now.
+        self.fout = open("../logs/debug.log", "a")
+
+    def __del__(self):
+        self.fout.close()
 
     def run(self): 
         ## Main function called by Thread.
@@ -22,10 +25,10 @@ class Response(Thread):
         result = self.process_request(json, headers, None)
 
         if result:
-            self.output("Placeholder.jpg")
+            self.fout.write("Placeholder.jpg")
 
         else:
-            self.output("Error: No result in API response.")
+            self.fout.write("Error: No result in API response.")
     def process_request(self, json, headers, params):
         """(Pulled from request_emotions) Request the API server.
 
@@ -41,21 +44,21 @@ class Response(Thread):
 
         while True:
             url = 'https://facial-expression-detector.cognitiveservices.azure.com/face/v1.0/detect?returnFaceAttributes=emotion,smile'
-            self.output("Set {} as the API request URL.".format(url))
-            self.output("Waiting for the response...")
+            self.fout.write("Set {} as the API request URL.".format(url))
+            self.fout.write("Waiting for the response...")
             response = requests.request('post',
                                         url,
                                         json=json,
                                         headers=headers,
                                         params=params)
             if response.status_code == 429:
-                self.output("Message: {}".format(response.json()['error']['message']))
+                self.fout.write("Message: {}".format(response.json()['error']['message']))
                 if retries <= max_retries_times:
                     time.sleep(1)
                     retries += 1
                     continue
                 else:
-                    self.output("Error: failed after retrying.")
+                    self.fout.write("Error: failed after retrying.")
                     break
             elif response.status_code == 200 or response.status_code == 201:
                 if 'content-length' in response.headers and int(response.headers['content-length']) == 0:
@@ -66,8 +69,8 @@ class Response(Thread):
                     elif 'image' in response.headers['content-type'].lower():
                         result = response.content
             else:
-                self.output("Error code: {}".format(response.status_code))
-                self.output("Message: {}".format(response.json()['error']['message']))
+                self.fout.write("Error code: {}".format(response.status_code))
+                self.fout.write("Message: {}".format(response.json()['error']['message']))
             break
         return result
 

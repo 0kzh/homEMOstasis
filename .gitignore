@@ -1,2 +1,4 @@
 emotion_api_demo/__pycache__
+logs/*
+
 .DS_store
