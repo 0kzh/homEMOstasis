@@ -9,7 +9,8 @@ from tkinter import Tk
 
 def main():
     """The main function."""
-    GUIRoot(Tk(), RequestEmotion)
+    gui_root = GUIRoot(RequestEmotion)
+    gui_root.mainloop()
 
 if __name__ == '__main__':
     main()

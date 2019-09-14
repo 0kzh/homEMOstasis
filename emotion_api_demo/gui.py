@@ -13,9 +13,9 @@ from .mpl import ResultImg
 class GUIRoot(Tk):
     """The tkinter GUI root class."""
 
-    def __init__(self, window, thread_cls):
+    def __init__(self, thread_cls):
         super().__init__()
-        self.window = window
+        self.window = self
         self.thread_cls = thread_cls
         self.img = None
         self.title("Emotion API")
@@ -27,21 +27,6 @@ class GUIRoot(Tk):
         self.vid = VideoCapture()
 
         # Create LabelFrames
-        lf_key = LabelFrame(self, text="Emotion API Key")
-        lf_key.grid(row=0, column=0, columnspan=1, sticky=W+E, padx=5, pady=3)
-        lf_key.grid_columnconfigure(0, weight=1)
-        lf_mode = LabelFrame(self, text="Mode")
-        lf_mode.grid(row=1, column=0, columnspan=1, sticky=W+E, padx=5, pady=3)
-        for i in range(3):
-            lf_mode.grid_columnconfigure(i, weight=1)
-        lf_source = LabelFrame(self, text="Image Source", height=50)
-        lf_source.grid(row=2, column=0, columnspan=1,
-                       sticky=W+E, padx=5, pady=3)
-        lf_source.rowconfigure(0, weight=1)
-        lf_source.grid_propagate(False)
-        lf_source.columnconfigure(0, weight=1)
-        lf_source.columnconfigure(1, weight=5)
-        lf_source.columnconfigure(2, weight=1)
         lf_request = LabelFrame(self, text="Request Result")
         lf_request.grid(row=3, column=0, columnspan=1,
                         sticky=W+E, padx=5, pady=3)
@@ -55,50 +40,7 @@ class GUIRoot(Tk):
         lf_img.grid(row=0, column=1, rowspan=5, sticky=N+S+W+E)
         lf_img.grid_columnconfigure(0, weight=1)
         lf_img.grid_rowconfigure(0, weight=1)
-
-        # Create Input Fields
-        self.ety_key = Entry(lf_key)
-        self.ety_key.insert(END, "eed879d931a146d1ac9992ce47e71342")
-        self.ety_key.grid(sticky=W+E, padx=3)
-        self.var_mode = StringVar()
-        Radiobutton(lf_mode,
-                    text="Local Image",
-                    variable=self.var_mode,
-                    value='local',
-                    command=self.change_mode).grid(row=1, column=0)
-        Radiobutton(lf_mode,
-                    text="URL Image",
-                    variable=self.var_mode,
-                    value='url',
-                    command=self.change_mode).grid(row=1, column=1)
-        Radiobutton(lf_mode,
-                    text="Camera",
-                    variable=self.var_mode,
-                    value='cam',
-                    command=self.change_mode).grid(row=1, column=2)
-        # Local Image Source
-        self.lb_filename = Label(lf_source, text="..")
-        self.btn_fileopen = Button(
-            lf_source, text="Open..", command=self.get_local_img)
-        # URL Image Source
-        self.lb_url = Label(lf_source, text="URL")
-        self.ety_url = Entry(lf_source)
-        self.ety_url.insert(END, "https://i.imgflip.com/qiev6.jpg")
-        self.btn_url = Button(lf_source, text="Get Image",
-                              command=self.get_url_img)
-        # Camera Image Source
-        self.btn_get_cam = Button(
-            lf_source, text="Get the Camera Image", command=self.get_cam_img)
-        # set default mode: local raw image
-        self.var_mode.set('local')
-        self.change_mode()
-        # request btn
-        self.btn_request = Button(lf_request,
-                                  text="Request Result",
-                                  command=self.run_request,
-                                  state='disable')
-        self.btn_request.grid(sticky=W+E)
-
+        
         # Create Output Console
         self.console = ScrolledText(
             lf_console, state='disable', width=60, bg='gray20', fg='white')
@@ -109,7 +51,6 @@ class GUIRoot(Tk):
         self.plot.grid(sticky=N+S+W+E)
 
         self.update()
-        self.mainloop()
 
     def update(self):
         s, self.img = self.vid.get_frame()
@@ -204,8 +145,6 @@ class VideoCapture:
     def __init__(self):
         # Open the video source
         self.vid = cv2.VideoCapture(0)
-        if not self.vid.isOpened():
-            raise ValueError("Unable to open video source", video_source)
  
         # Get video source width and height
         self.width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)
