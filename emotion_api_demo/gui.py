@@ -4,6 +4,7 @@ from tkinter import Button, Entry, Radiobutton, Tk, Label, LabelFrame, StringVar
 from tkinter.filedialog import askopenfilename
 from tkinter.scrolledtext import ScrolledText
 from io import BytesIO
+import time
 import cv2
 import requests
 import numpy as np
@@ -16,9 +17,14 @@ class GUIRoot(Tk):
     def __init__(self, thread_cls):
         super().__init__()
         self.window = self
+        self.last_request = 0
+        self.running = False
         self.thread_cls = thread_cls
         self.img = None
-        self.title("Emotion API")
+        self.title("HomEMOstasis")
+
+        # our ms azure api key :)
+        self.ety_key = "eed879d931a146d1ac9992ce47e71342"
         self.grid()
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=2)
@@ -27,8 +33,8 @@ class GUIRoot(Tk):
         self.vid = VideoCapture()
 
         # Create LabelFrames
-        lf_request = LabelFrame(self, text="Request Result")
-        lf_request.grid(row=3, column=0, columnspan=1,
+        lf_request = LabelFrame(self, text="Control Panel")
+        lf_request.grid(row=0, column=0, columnspan=1,
                         sticky=W+E, padx=5, pady=3)
         lf_request.grid_columnconfigure(0, weight=1)
         lf_console = LabelFrame(self, text="Console")
@@ -40,6 +46,22 @@ class GUIRoot(Tk):
         lf_img.grid(row=0, column=1, rowspan=5, sticky=N+S+W+E)
         lf_img.grid_columnconfigure(0, weight=1)
         lf_img.grid_rowconfigure(0, weight=1)
+
+        self.btn_start = Button(lf_request,
+                                  text="Start Analysis",
+                                  command=self.start_analysis,
+                                  state='normal')
+        self.btn_start.grid(sticky = 'nsew', row = 0, column = 0,)
+
+        self.btn_stop = Button(lf_request,
+                                  text="Stop Analysis",
+                                  command=self.stop_analysis,
+                                  state='disabled')
+        self.btn_stop.grid(sticky = 'nsew', row = 0, column = 1)
+
+        lf_request.grid_columnconfigure(0, weight=1, uniform="group1")
+        lf_request.grid_columnconfigure(1, weight=1, uniform="group1")
+        lf_request.grid_rowconfigure(0, weight=1)
         
         # Create Output Console
         self.console = ScrolledText(
@@ -56,7 +78,14 @@ class GUIRoot(Tk):
         s, self.img = self.vid.get_frame()
         self.img = cv2.imencode('.jpg', self.img)[1].tostring()
         self.plot.imshow(img_decode(self.img))
+        elapsed_time = time.time() - self.last_request
 
+        # ensure at least 500 ms between each request
+        # let's keep this rate-limited at 2s for now, scale down to 0.5s for demo
+        timeout = 2
+        if self.running and elapsed_time >= timeout:
+            self.run_request()
+            self.last_request = time.time()
         self.window.after(10, self.update)
 
     def change_mode(self):
@@ -85,53 +114,22 @@ class GUIRoot(Tk):
 
     def run_request(self):
         """Create the requesting thread to request the result from Emotion API."""
-        source = self.ety_url.get() if self.var_mode.get() == 'url' else self.img
-        self.thread_cls(self.ety_key.get(),
-                        self.var_mode.get(),
-                        source,
+        self.thread_cls(self.ety_key,
+                        'cam',
+                        self.img,
                         self.plot,
                         self.print_console).start()
 
-    def get_local_img(self):
-        """Open the dialog let user to choose test file and get the test data."""
-        max_name_len = 20
-        filename = askopenfilename(filetypes=(("JPEG", "*.jpg"),
-                                              ("PNG", "*.png"),
-                                              ("All Files", "*.*")),
-                                   title="Choose an Image")
-        if filename:
-            with open(filename, 'rb') as f:
-                self.img = f.read()
-            self.plot.imshow(img_decode(self.img))
-            self.print_console("Open a local raw image file.")
-            self.btn_request.config(state='normal')
-            if len(filename) > max_name_len:
-                self.lb_filename.config(text=".."+filename[-max_name_len:])
-            else:
-                self.lb_filename.config(text=filename)
+    
+    def start_analysis(self):
+        self.running = True
+        self.btn_start['state'] = 'disabled'
+        self.btn_stop['state'] = 'normal'
 
-    def get_url_img(self):
-        """Get the image from the given URL."""
-        try:
-            self.plot.imshow(Image.open(
-                BytesIO(requests.get(self.ety_url.get()).content)))
-        except Exception as e:
-            self.print_console(e.args)
-        else:
-            self.print_console("Open a online image from URL.")
-            self.btn_request.config(state='normal')
-
-    def get_cam_img(self):
-        """Get the image from the laptop camera."""
-        # cam = cv2.VideoCapture(0)   # 0 -> index of camera
-        # while(True):
-        #     s, self.img = cam.read()
-        #     self.plot.imshow(img_decode(self.img))
-            # cv2.imshow('frame', )
-            # self.img = cv2.imencode('.jpg', self.img)[1].tostring()
-            # if s:    # frame captured without any errors
-            #     self.print_console("Camera image captured.")
-            #     self.btn_request.config(state='normal')
+    def stop_analysis(self):
+        self.running = False
+        self.btn_start['state'] = 'normal'
+        self.btn_stop['state'] = 'disabled'
 
     def print_console(self, input_str):
         """Print the text on the conolse."""
