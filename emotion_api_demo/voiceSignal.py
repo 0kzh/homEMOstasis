@@ -3,6 +3,7 @@ import requests
 import time
 from xml.etree import ElementTree
 
+
 class TextToSpeech(object):
     def __init__(self, subscription_key):
         self.subscription_key = subscription_key
@@ -39,7 +40,7 @@ class TextToSpeech(object):
 
         response = requests.post(constructed_url, headers=headers, data=body)
         if response.status_code == 200:
-            with open('sample-' + self.timestr + '.wav', 'wb') as audio:
+            with open('sample.wav', 'wb') as audio:
                 audio.write(response.content)
                 print("\nStatus code: " + str(response.status_code) +
                     "\nYour TTS is ready for playback.\n")
@@ -52,3 +53,6 @@ if __name__ == "__main__":
     app = TextToSpeech(subscription_key)
     app.get_token()
     app.save_audio()
+    os.system('afplay "sample.wav"')
+    os.remove("sample.wav")
+    
