@@ -11,7 +11,7 @@ from pygame import mixer
 class RequestEmotion(Thread):
     """The class to request result from Emotion API."""
     def __init__(self, key, mode, source, plot, print_func):
-        self.tts = TextToSpeech('c989d0f018194adca6f46bcd25547ca7')
+        self.tts = TextToSpeech('f184f976b22c4512ab6a9321cd5c4e27')
         self.insults = InsultGenerator()
         self.tts.get_token()
         """Parameters

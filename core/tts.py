@@ -12,16 +12,17 @@ class TextToSpeech(object):
         self.access_token = None
 
     def get_token(self):
-        fetch_token_url = " https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken"
+        fetch_token_url = " https://eastus.api.cognitive.microsoft.com/sts/v1.0/issueToken"
         headers = {
             'Ocp-Apim-Subscription-Key': self.subscription_key
         }
         response = requests.post(fetch_token_url, headers=headers)
         self.access_token = str(response.text)
+        print(self.access_token)
 
     def play_audio(self, text):
-        base_url = 'https://westus.tts.speech.microsoft.com/'
-        path = 'cognitiveservices/v1'
+        base_url = 'https://eastus.voice.speech.microsoft.com/'
+        path = 'cognitiveservices/v1?deploymentId=5ff48f35-79fa-47a3-9f82-c6bf020b3312'
         constructed_url = base_url + path
         headers = {
             'Authorization': 'Bearer ' + self.access_token,
@@ -34,11 +35,13 @@ class TextToSpeech(object):
         voice = ElementTree.SubElement(xml_body, 'voice')
         voice.set('{http://www.w3.org/XML/1998/namespace}lang', 'en-US')
         voice.set(
-            'name', 'Microsoft Server Speech Text to Speech Voice (en-US, Guy24KRUS)')
+            'name', 'trump donaldo')
         voice.text = text
+        print(text)
         body = ElementTree.tostring(xml_body)
 
         response = requests.post(constructed_url, headers=headers, data=body)
+        print(response)
         if response.status_code == 200:
             with open('sample.wav', 'wb') as audio:
                 audio.write(response.content)
