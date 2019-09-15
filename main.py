@@ -3,8 +3,8 @@
    Author: Sean Wu (104502551)
 """
 
-from emotion_api_demo.gui import GUIRoot
-from emotion_api_demo.request_emotion import RequestEmotion
+from core.gui import GUIRoot
+from core.request_emotion import RequestEmotion
 from tkinter import Tk
 
 def main():

@@ -42,7 +42,7 @@ class GUIRoot(Tk):
                         sticky=N+S+W+E, padx=5, pady=3)
         lf_console.grid_columnconfigure(0, weight=1)
         lf_console.grid_rowconfigure(0, weight=1)
-        lf_img = LabelFrame(self, text="Output Image")
+        lf_img = LabelFrame(self, text="Webcam View")
         lf_img.grid(row=0, column=1, rowspan=5, sticky=N+S+W+E)
         lf_img.grid_columnconfigure(0, weight=1)
         lf_img.grid_rowconfigure(0, weight=1)
