@@ -40,9 +40,9 @@ class Response(Thread):
         self.key = ""
 
         # For file debug
-        script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
+        script_dir = path.dirname(__file__) #<-- absolute dir the script is in
         rel_path = "../logs/debug.log"
-        abs_file_path = os.path.join(script_dir, rel_path)
+        abs_file_path = path.join(script_dir, rel_path)
 
         self.fout = open(abs_file_path, "a")
 
