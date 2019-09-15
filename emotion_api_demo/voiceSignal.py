@@ -3,6 +3,12 @@ import requests
 import time
 from xml.etree import ElementTree
 
+# suppose we have a global variable in the db indicates the current
+# emotion
+
+def checkEmotionChanges(result, currentEmotion):
+    if (currentEmotion == "neutral" and (result == "happy" or result == "sad")):
+        os.system('afplay "sample.wav"')
 
 class TextToSpeech(object):
     def __init__(self, subscription_key):
@@ -53,6 +59,10 @@ if __name__ == "__main__":
     app = TextToSpeech(subscription_key)
     app.get_token()
     app.save_audio()
-    os.system('afplay "sample.wav"')
+    #just for example
+    result = "sad"
+    currentEmotion = "sad"
+    checkEmotionChanges(result, currentEmotion)
+    currentEmotion = result # change current emotion
     os.remove("sample.wav")
     
