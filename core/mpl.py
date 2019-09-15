@@ -21,6 +21,10 @@ class ResultImg(Frame):
     def imshow(self, img):
         """Show the image on the main axis."""
         self.ax.clear()
+        self.ax.set_xticks([])
+        self.ax.set_yticks([])
+        self.ax.set_yticklabels([])
+        self.ax.set_xticklabels([])
         self.ax.imshow(img)
         self.canvas.draw()
 

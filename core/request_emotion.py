@@ -86,8 +86,6 @@ class RequestEmotion(Thread):
 
         while True:
             url = 'https://facial-expression-detector.cognitiveservices.azure.com/face/v1.0/detect?returnFaceAttributes=emotion,smile'
-            self.print("Set {} as the API request URL.".format(url))
-            self.print("Waiting for the response...")
             response = requests.request('post',
                                         url,
                                         json=json,
