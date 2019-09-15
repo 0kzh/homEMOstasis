@@ -62,8 +62,8 @@ class RequestEmotion(Thread):
             emotion = max(emodict, key=emodict.get)
 
             self.print(emotion)
-            if (e.get_emotion() == "neutral" and (emotion in positive or emotion in negative)):
-                self.tts.play_audio(self.insults.gen_insult())
+            # if (e.get_emotion() == "neutral" and (emotion in positive or emotion in negative)):
+            self.tts.play_audio(self.insults.gen_insult())
 
             e.set_emotion(emotion)
             
