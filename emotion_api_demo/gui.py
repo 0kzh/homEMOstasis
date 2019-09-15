@@ -89,7 +89,7 @@ class GUIRoot(Tk):
             self.last_request = time.time()
         
         # Run any pending tasks:
-        q.execFromMain()
+        # q.execFromMain()
         self.window.after(500, self.update)
 
     def change_mode(self):
