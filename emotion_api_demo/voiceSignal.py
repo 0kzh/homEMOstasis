@@ -50,6 +50,6 @@ class TextToSpeech(object):
 
 if __name__ == "__main__":
     subscription_key = 'c989d0f018194adca6f46bcd25547ca7'
-    app = TextToSpeech("Hello world"<subscription_key)
+    app = TextToSpeech("Hello world",subscription_key)
     app.get_token()
     app.save_audio()

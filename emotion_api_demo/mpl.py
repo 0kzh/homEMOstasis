@@ -47,4 +47,4 @@ class ResultImg(Frame):
                              xy=(face_rect['left'], face_rect['top'] - 15),
                              color='black',
                              bbox=dict(boxstyle="round", fc="w", lw=0, alpha=0.6))
-        # self.canvas.draw()
+        self.canvas.draw()

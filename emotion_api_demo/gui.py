@@ -10,6 +10,7 @@ import requests
 import numpy as np
 from PIL import Image
 from .mpl import ResultImg
+import emotion_api_demo.queue as q
 
 class GUIRoot(Tk):
     """The tkinter GUI root class."""
@@ -86,7 +87,10 @@ class GUIRoot(Tk):
         if self.running and elapsed_time >= timeout:
             self.run_request()
             self.last_request = time.time()
-        self.window.after(10, self.update)
+        
+        # Run any pending tasks:
+        q.execFromMain()
+        self.window.after(500, self.update)
 
     def change_mode(self):
         """Change the image source mode."""
