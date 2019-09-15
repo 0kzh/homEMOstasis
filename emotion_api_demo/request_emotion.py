@@ -3,7 +3,7 @@
 import time
 from threading import Thread
 import requests
-from emotion_api_demo import get_response
+from emotion_api_demo import get_response, queue as que
 
 class RequestEmotion(Thread):
     """The class to request result from Emotion API."""
@@ -48,12 +48,15 @@ class RequestEmotion(Thread):
             self.print(result)
             emodict = result[0]["faceAttributes"]["emotion"]
             emotion = max(emodict, key=emodict.get)
+            self.print(emotion)
             response = get_response.Response(emotion)
 
-            self.plot.draw_labels(result)
-
+            # Call this on main thread:
+            que.runOnMain(self.plot.draw_labels(result))
+            
             # Start new thread to query for response given emotion. 
             response.start()
+
         else:
             self.print("Error: No result in API response.")
 

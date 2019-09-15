@@ -11,9 +11,10 @@ def checkEmotionChanges(result, currentEmotion):
         os.system('afplay "sample.wav"')
 
 class TextToSpeech(object):
-    def __init__(self, subscription_key):
+    def __init__(self, message, subscription_key):
         self.subscription_key = subscription_key
-        self.tts = input("What would you like to convert to speech: ")
+        # self.tts = input("What would you like to convert to speech: ")
+        self.tts = message
         self.timestr = time.strftime("%Y%m%d-%H%M")
         self.access_token = None
 
@@ -56,7 +57,7 @@ class TextToSpeech(object):
 
 if __name__ == "__main__":
     subscription_key = 'c989d0f018194adca6f46bcd25547ca7'
-    app = TextToSpeech(subscription_key)
+    app = TextToSpeech("Hello world",subscription_key)
     app.get_token()
     app.save_audio()
     #just for example
